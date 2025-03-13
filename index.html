@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>老後資金シミュレーター</title>
+  <!-- Chart.js の読み込み -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* フォント設定：LINE Seed JP_TTF（TTFファイルは同一ディレクトリに配置してください） */
+    @font-face {
+      font-family: 'LINE Seed JP_TTF';
+      src: url('LINESeedJP_TTF.ttf') format('truetype');
+    }
+    * { box-sizing: border-box; }
+    html { font-size: 16px; }
+    body {
+      font-family: 'LINE Seed JP_TTF', sans-serif;
+      background-color: #ffffff;
+      padding: 20px;
+      color: #545454;
+      margin: 0;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      padding: 0 10px;
+    }
+    .results, .inputs {
+      width: 80%;
+      max-width: 800px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      background-color: #fff;
+    }
+    /* STEPテキスト用（追加部分） */
+    .step-container {
+      width: 80%;
+      max-width: 800px;
+      text-align: center;  /* 横軸中央に変更 */
+      margin-bottom: 20px;
+    }
+    .step-indicator {
+      display: inline-block;
+      vertical-align: top;
+    }
+    .step-image {
+      width: 80px; /* PC用：80px */
+      height: auto;
+    }
+    .step-description {
+      display: inline-block;
+      margin-left: 10px;
+      font-size: 28px; /* PC用：28px */
+      font-weight: bold;
+      color: #00aaff;
+      position: relative;
+      margin-top: 20px;  /* 上に寄せる */
+      padding-bottom: 4px;
+    }
+    .step-description::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 8px;
+      height: 10px; /* マーカーラインの太さ */
+      background-color: #ffeb3b;
+      z-index: -1;
+    }
+    /* 結果エリア */
+    .results { position: relative; }
+    
+    /* 入力ラッパー */
+    .input-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+    .input-wrapper input[type="number"],
+    .input-wrapper select {
+      padding: 8px 100px 8px 8px;
+      border: 1px solid #009bdd;
+      border-radius: 4px;
+      height: 40px;
+      box-sizing: border-box;
+      font-size: 16px;
+      color: #00aaff;
+    }
+    .input-wrapper input[type="number"]::-webkit-inner-spin-button,
+    .input-wrapper input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    
+    /* PC用：各入力固定幅（200px） */
+    #retirement-start-age, #retirement-end-age { width: 200px; }
+    #final-assets { width: 200px; }
+    #annual-rate-1 { width: 200px; }
+    #withdrawal-1 { width: 200px; }
+    
+    .chart-container {
+      position: relative;
+      margin-bottom: 10px;
+    }
+    .input-overlay {
+      margin-top: 20px;
+      padding: 0 20px;
+    }
+    .input-overlay .row { 
+      display: flex; 
+      width: 100%; 
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .first-row { justify-content: space-between; }
+    .left-item { text-align: left; flex: 1; }
+    .right-item { text-align: right; flex: 1; margin-left: 50px; }
+    .additional-row {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .additional-row .left-item,
+    .additional-row .right-item { flex: 1; }
+    .additional-row .right-item { text-align: right; }
+    .full-item {
+      flex: 1;
+      width: 100%;
+    }
+    
+    /* 結果表示 */
+    #required-amount {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #009bdd;
+    }
+    
+    /* シミュレーション開始ボタン */
+    .c-button._shiny {
+      display: block;
+      margin: 20px auto;  /* 中央寄せ */
+      padding: 0.7em 1em;
+      background-color: #009bdd;
+      box-shadow: 0 2px 0 0 #0078b8;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 14px;
+      max-width: 500px;
+      color: #fff;
+      text-align: center;
+      text-decoration: none;
+      overflow: hidden;
+      transition: 300ms;
+      position: relative;
+    }
+    .c-button._shiny::before {
+      position: absolute;
+      content: '';
+      display: inline-block;
+      top: -180px;
+      left: 0;
+      width: 30px;
+      height: 100%;
+      background-color: #b5e7ff;
+      transition: 300ms;
+      animation: shinyshiny 2.5s ease-in-out infinite;
+    }
+    .c-button._shiny:hover {
+      text-decoration: none;
+      color: #fff;
+      box-shadow: none;
+      -webkit-transform: translateY(2px);
+    }
+    @-webkit-keyframes shinyshiny {
+      0% { -webkit-transform: scale(0) rotate(45deg); opacity: 0; }
+      80% { -webkit-transform: scale(0) rotate(45deg); opacity: 0.5; }
+      81% { -webkit-transform: scale(4) rotate(45deg); opacity: 1; }
+      100% { -webkit-transform: scale(50) rotate(45deg); opacity: 0; }
+    }
+    
+    canvas {
+      max-width: 100%;
+      height: auto;
+    }
+    
+    /* レスポンシブ対応 */
+    @media screen and (max-width: 768px) {
+      .results, .inputs {
+        width: 95%;
+        padding: 15px;
+      }
+      .input-overlay .row {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .left-item, .right-item {
+        margin: 0;
+        text-align: left;
+      }
+      #retirement-start-age, #retirement-end-age,
+      #final-assets, #annual-rate-1, #withdrawal-1 {
+        width: 60px;
+      }
+      .input-wrapper input[type="number"],
+      .input-wrapper select {
+        padding-right: 80px;
+      }
+      .c-button._shiny {
+        margin: 20px auto;
+      }
+      /* スマホ表示時、全体の行間やフォントサイズ調整 */
+      body { line-height: 1.6; }
+      .step-image { width: 50px; } /* スマホ用にSTEP画像サイズを50pxに */
+      .step-description { 
+         font-size: 18px; /* スマホ用STEP見出しを22pxに */
+         margin-left: 5px;  /* STEP画像とテキストの間の幅を狭く */
+      }
+      .inputs .field-group input[type="number"],
+      .inputs .field-group select {
+        width: 100%; /* スマホ用に入力フィールドの幅を100%に */
+      }
+    }
+    
+    /* オプション入力エリア（カード削除版：各セクションを平坦に配置） */
+    .inputs h4 {
+      color: #009bdd;
+      margin: 10px 0 5px;
+      font-size: 1.3em;
+      font-weight: bold;
+    }
+    .inputs p {
+      font-size: 0.9em;
+      color: #545454;
+      margin-bottom: 10px;
+    }
+    .inputs .field-group {
+      margin-bottom: 10px;
+    }
+    .inputs .field-group span.field-label {
+      display: inline-block;
+      width: 150px;
+      font-weight: bold;
+    }
+    .inputs .field-group input[type="number"],
+    .inputs .field-group select {
+      background-color: #e6f7ff; /* 入力フィールドのみ薄い水色 */
+      border: none;
+      padding: 8px;
+      font-size: 16px;
+      width: 100px;
+      color: #00aaff;
+    }
+    .inputs .field-group input[type="number"]::-webkit-inner-spin-button,
+    .inputs .field-group input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .inputs .field-group span.field-unit {
+      margin-left: 5px;
+      font-size: 16px;
+      color: #545454;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #ddd;
+      margin: 15px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- タイトル部分：画像を横幅MAXで表示 -->
+    <img src="title.webp" alt="老後資金シミュレーター" style="width:100%; height:auto;">
+    
+    <!-- STEP1（画像挿入可能） -->
+    <div class="step-container step1">
+      <div class="step-indicator">
+        <img class="step-image" src="step1.png" alt="STEP 1">
+      </div>
+      <div class="step-description">基本的な項目を入力しよう</div>
+    </div>
+    
+    <!-- 結果エリア（上部） -->
+    <div class="results">
+      <p>保有額(老後開始時): <span id="required-amount">0.00</span> 万円</p>
+      
+      <!-- グラフエリア -->
+      <div class="chart-container">
+        <canvas id="financial-chart" width="600" height="300"></canvas>
+        <script>
+          let retirementChart;
+          document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('financial-chart').getContext('2d');
+            const initialData = {
+              labels: ['65歳', '70歳', '75歳', '80歳', '85歳', '90歳'],
+              datasets: [{
+                label: '資産推移 (万円)',
+                data: [1000, 900, 800, 700, 600, 500],
+                backgroundColor: 'rgba(0, 155, 221, 0.2)',
+                borderColor: '#009bdd',
+                borderWidth: 1
+              }]
+            };
+            const chartOptions = {
+              responsive: true,
+              scales: { y: { beginAtZero: true } }
+            };
+            retirementChart = new Chart(ctx, {
+              type: 'bar',
+              data: initialData,
+              options: chartOptions
+            });
+          });
+        </script>
+        <!-- 入力エリア（グラフ下部） -->
+        <div class="input-overlay">
+          <div class="row first-row">
+            <div class="left-item">
+              <label for="retirement-start-age">年齢(老後開始)</label>
+              <div class="input-wrapper">
+                <select id="retirement-start-age" required></select>
+                <span class="input-suffix">歳</span>
+              </div>
+            </div>
+            <div class="right-item">
+              <label for="retirement-end-age">年齢(老後終了)</label>
+              <div class="input-wrapper">
+                <select id="retirement-end-age" required></select>
+                <span class="input-suffix">歳</span>
+              </div>
+            </div>
+          </div>
+          <div class="row additional-row">
+            <div class="left-item">
+              <label for="withdrawal-1">取崩月額(基本)</label>
+              <div class="input-wrapper">
+                <input type="number" id="withdrawal-1" placeholder="5" required>
+                <span class="input-suffix">万円/月</span>
+              </div>
+            </div>
+            <div class="right-item">
+              <label for="final-assets">保有額(老後終了時)</label>
+              <div class="input-wrapper">
+                <input type="number" id="final-assets" placeholder="100" required>
+                <span class="input-suffix">万円</span>
+              </div>
+            </div>
+          </div>
+          <!-- 追加行：想定年利(基本/老後)（ラベル改行） -->
+          <div class="row">
+            <div class="full-item">
+              <label for="annual-rate-1">想定年利(基本/老後)</label><br>
+              <div class="input-wrapper">
+                <input type="number" id="annual-rate-1" placeholder="5" required>
+                <span class="input-suffix">％</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- シミュレーション開始ボタン：グラフエリアの下に中央寄せで表示 -->
+      <button id="calculate" class="c-button _shiny">シミュレーション開始</button>
+    </div>
+    
+    <!-- STEP2（画像挿入可能） -->
+    <div class="step-container step2">
+      <div class="step-indicator">
+        <img class="step-image" src="step2.png" alt="STEP 2">
+      </div>
+      <div class="step-description">任意の項目を入力しよう</div>
+    </div>
+    
+    <!-- オプション入力エリア（カード削除版：各セクションを平坦に配置） -->
+    <div class="inputs">
+      <!-- 金利・取崩額の変更セクション -->
+      <h4>金利・取崩額の変更</h4>
+      <div class="field-group">
+        <span class="field-label">変更する年齢</span>
+        <select id="change-age" class="card-input"></select>
+        <span class="field-unit">歳</span>
+      </div>
+      <div class="field-group">
+        <span class="field-label">変更後の取崩月額</span>
+        <input type="number" id="new-withdrawal" class="card-input" placeholder="10">
+        <span class="field-unit">万円</span>
+      </div>
+      <div class="field-group">
+        <span class="field-label">想定年利</span>
+        <input type="number" id="new-annual-rate" class="card-input" placeholder="5">
+        <span class="field-unit">％</span>
+      </div>
+      <hr>
+      <!-- 一括取崩セクション -->
+      <h4>一括取崩</h4>
+      <p>一括取り崩しとは、特定の年齢でまとめて資金を取り崩す方法です。急な資金需要に柔軟に対応できます。</p>
+      <div class="field-group">
+        <span class="field-label">年齢</span>
+        <select id="lump-withdrawal-age" class="card-input"></select>
+        <span class="field-unit">歳</span>
+      </div>
+      <div class="field-group">
+        <span class="field-label">金額</span>
+        <input type="number" id="lump-withdrawal-amount" class="card-input" placeholder="50">
+        <span class="field-unit">万円</span>
+      </div>
+      <hr>
+      <!-- 一括投資セクション -->
+      <h4>一括投資</h4>
+      <p>一括投資とは、特定の年齢で一度に資金を投資する方法です。市場タイミングを考慮したシミュレーションが可能です。</p>
+      <div class="field-group">
+        <span class="field-label">年齢</span>
+        <select id="lump-investment-age" class="card-input"></select>
+        <span class="field-unit">歳</span>
+      </div>
+      <div class="field-group">
+        <span class="field-label">金額</span>
+        <input type="number" id="lump-investment-amount" class="card-input" placeholder="50">
+        <span class="field-unit">万円</span>
+      </div>
+      <!-- シミュレーション開始ボタンを下部にも追加 -->
+      <button id="calculate2" class="c-button _shiny">シミュレーション開始</button>
+    </div>
+  </div>
+  
+  <script>
+    // ドロップダウンのオプション生成（16〜120）
+    document.addEventListener('DOMContentLoaded', function() {
+      function populateSelect(selectId, defaultVal) {
+        var selectElem = document.getElementById(selectId);
+        for (var i = 16; i <= 120; i++) {
+          var option = document.createElement("option");
+          option.value = i;
+          option.textContent = i;
+          if (defaultVal !== undefined && i === defaultVal) { 
+            option.selected = true; 
+          }
+          selectElem.appendChild(option);
+        }
+      }
+      populateSelect("retirement-start-age", 60);
+      populateSelect("retirement-end-age", 85);
+      populateSelect("change-age", 60);
+      populateSelect("lump-withdrawal-age", 70);
+      populateSelect("lump-investment-age", 70);
+    });
+    
+    // シミュレーション計算
+    document.addEventListener('DOMContentLoaded', function() {
+      function runSimulation() {
+        // 基本入力
+        const withdrawal1 = parseFloat(document.getElementById("withdrawal-1").value);
+        const annualRate1 = parseFloat(document.getElementById("annual-rate-1").value);
+        const retirementStartAge = parseFloat(document.getElementById("retirement-start-age").value);
+        const retirementEndAge = parseFloat(document.getElementById("retirement-end-age").value);
+        const finalAssets = parseFloat(document.getElementById("final-assets").value);
+        
+        if(isNaN(withdrawal1) || isNaN(annualRate1) ||
+           isNaN(retirementStartAge) || isNaN(retirementEndAge) || isNaN(finalAssets)) {
+          alert("必須項目（老後開始年齢、老後終了年齢、最終保有額、取崩月額(基本)、想定年利(基本/老後)）を正しく入力してください。");
+          return;
+        }
+        if(retirementEndAge <= retirementStartAge) {
+          alert("老後終了年齢は老後開始年齢より大きくなければなりません。");
+          return;
+        }
+        
+        // 追加項目（未入力の場合はデフォルト値を使用）
+        let changeAge = parseFloat(document.getElementById("change-age").value);
+        if(isNaN(changeAge)) { changeAge = retirementEndAge + 1; } // 切り替えなし
+        let newWithdrawal = parseFloat(document.getElementById("new-withdrawal").value);
+        if(isNaN(newWithdrawal)) { newWithdrawal = withdrawal1; }
+        let newAnnualRate = parseFloat(document.getElementById("new-annual-rate").value);
+        if(isNaN(newAnnualRate)) { newAnnualRate = annualRate1; }
+        
+        let lumpWithdrawalAge = parseFloat(document.getElementById("lump-withdrawal-age").value);
+        if(isNaN(lumpWithdrawalAge)) { lumpWithdrawalAge = Infinity; }
+        let lumpWithdrawalAmount = parseFloat(document.getElementById("lump-withdrawal-amount").value);
+        if(isNaN(lumpWithdrawalAmount)) { lumpWithdrawalAmount = 0; }
+        let lumpInvestmentAge = parseFloat(document.getElementById("lump-investment-age").value);
+        if(isNaN(lumpInvestmentAge)) { lumpInvestmentAge = Infinity; }
+        let lumpInvestmentAmount = parseFloat(document.getElementById("lump-investment-amount").value);
+        if(isNaN(lumpInvestmentAmount)) { lumpInvestmentAmount = 0; }
+        
+        const totalMonths = (retirementEndAge - retirementStartAge) * 12;
+        const switchingMonth = (changeAge - retirementStartAge) * 12;
+        const lumpWithdrawalMonth = (lumpWithdrawalAge - retirementStartAge) * 12;
+        const lumpInvestmentMonth = (lumpInvestmentAge - retirementStartAge) * 12;
+        
+        const i1 = (annualRate1 / 100) / 12;
+        const i2 = (newAnnualRate / 100) / 12;
+        
+        // 逆算計算（最終保有額(老後終了時)から老後開始時の必要資産を求める）
+        let requiredAsset = finalAssets;
+        for (let m = totalMonths - 1; m >= 0; m--) {
+          if (m + 1 === lumpWithdrawalMonth) { requiredAsset += lumpWithdrawalAmount; }
+          if (m + 1 === lumpInvestmentMonth) { requiredAsset -= lumpInvestmentAmount; }
+          let currentWithdrawal = (m < switchingMonth ? withdrawal1 : newWithdrawal);
+          let currentInterest = (m < switchingMonth ? i1 : i2);
+          requiredAsset = (requiredAsset + currentWithdrawal) / (1 + currentInterest);
+        }
+        
+        document.getElementById("required-amount").textContent = requiredAsset.toFixed(2);
+        
+        // 前向きシミュレーション（グラフ用）
+        let simulationLabels = [];
+        let simulationData = [];
+        let asset = requiredAsset;
+        for (let m = 0; m <= totalMonths; m++) {
+          if (m === lumpWithdrawalMonth) { asset -= lumpWithdrawalAmount; }
+          if (m === lumpInvestmentMonth) { asset += lumpInvestmentAmount; }
+          if (m % 12 === 0) {
+            simulationLabels.push((retirementStartAge + m/12) + "歳");
+            simulationData.push(parseFloat(asset.toFixed(2)));
+          }
+          let currentWithdrawal = (m < switchingMonth ? withdrawal1 : newWithdrawal);
+          let currentInterest = (m < switchingMonth ? i1 : i2);
+          asset = asset * (1 + currentInterest) - currentWithdrawal;
+        }
+        
+        retirementChart.data.labels = simulationLabels;
+        retirementChart.data.datasets[0].data = simulationData;
+        retirementChart.update();
+        
+        // 2つ目のボタンの場合、結果エリアへスライド
+        document.querySelector(".results").scrollIntoView({ behavior: 'smooth' });
+      }
+      
+      document.getElementById("calculate").addEventListener("click", runSimulation);
+      // 2つ目のボタンのイベント：runSimulation関数を実行後、結果エリアへスライド
+      document.getElementById("calculate2").addEventListener("click", runSimulation);
+    });
+  </script>
+  
+</body>
+</html>
