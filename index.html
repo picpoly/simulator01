@@ -12,8 +12,12 @@
       font-family: 'LINE Seed JP_TTF';
       src: url('LINESeedJP_TTF.ttf') format('truetype');
     }
-    * { box-sizing: border-box; }
-    html { font-size: 16px; }
+    * {
+      box-sizing: border-box;
+    }
+    html {
+      font-size: 16px;
+    }
     body {
       font-family: 'LINE Seed JP_TTF', sans-serif;
       background-color: #ffffff;
@@ -21,15 +25,33 @@
       color: #545454;
       margin: 0;
     }
+
+    /* 画像をPC・スマホともに横幅100%にするクラス */
+    .title-image {
+      width: 100%;
+      height: auto;
+      display: block;
+      max-width: 100%;
+    }
+
     /* PCビュー（768px以上）の場合 */
     @media screen and (min-width: 769px) {
-      .pc-label { display: inline-block; }
-      .mobile-label { display: none; }
+      .pc-label {
+        display: inline-block;
+      }
+      .mobile-label {
+        display: none;
+      }
     }
+
     /* スマホビュー（768px以下）の場合 */
     @media screen and (max-width: 768px) {
-      .pc-label { display: none; }
-      .mobile-label { display: inline-block; }
+      .pc-label {
+        display: none;
+      }
+      .mobile-label {
+        display: inline-block;
+      }
     }
 
     .container {
@@ -39,6 +61,7 @@
       gap: 20px;
       padding: 0 10px;
     }
+
     /* カードスタイル削除：境界線、角丸、影を除去してフラットなデザインに */
     .results, .inputs {
       width: 80%;
@@ -46,6 +69,7 @@
       padding: 20px;
       background-color: #ffffff;
     }
+
     /* STEPテキスト用 */
     .step-container {
       width: 80%;
@@ -81,16 +105,19 @@
       background-color: #ffeb3b;
       z-index: -1;
     }
+
     /* 結果エリア */
-    .results { position: relative; }
-    
+    .results {
+      position: relative;
+    }
+
     /* 入力ラッパ（グラフ下部の入力エリア） */
     .input-wrapper input[type="number"],
     .input-wrapper select {
       padding: 8px 100px 8px 8px;
-      border: none;             
-      background-color: #e6f7ff; 
-      border-radius: 0;         
+      border: none;
+      background-color: #e6f7ff;
+      border-radius: 0;
       height: 40px;
       box-sizing: border-box;
       font-size: 16px;
@@ -101,13 +128,13 @@
       -webkit-appearance: none;
       margin: 0;
     }
-    
+
     /* PC用：各入力固定幅（200px） */
     #retirement-start-age, #retirement-end-age { width: 200px; }
     #final-assets { width: 200px; }
     #annual-rate-1 { width: 200px; }
     #withdrawal-1 { width: 200px; }
-    
+
     .chart-container {
       position: relative;
       margin-bottom: 10px;
@@ -116,15 +143,24 @@
       margin-top: 20px;
       padding: 0 20px;
     }
-    .input-overlay .row { 
-      display: flex; 
-      width: 100%; 
+    .input-overlay .row {
+      display: flex;
+      width: 100%;
       gap: 20px;
       flex-wrap: wrap;
     }
-    .first-row { justify-content: space-between; }
-    .left-item { text-align: left; flex: 1; }
-    .right-item { text-align: right; flex: 1; margin-left: 50px; }
+    .first-row {
+      justify-content: space-between;
+    }
+    .left-item {
+      text-align: left;
+      flex: 1;
+    }
+    .right-item {
+      text-align: right;
+      flex: 1;
+      margin-left: 50px;
+    }
     .additional-row {
       margin-top: 20px;
       display: flex;
@@ -133,20 +169,24 @@
       flex-wrap: wrap;
     }
     .additional-row .left-item,
-    .additional-row .right-item { flex: 1; }
-    .additional-row .right-item { text-align: right; }
+    .additional-row .right-item {
+      flex: 1;
+    }
+    .additional-row .right-item {
+      text-align: right;
+    }
     .full-item {
       flex: 1;
       width: 100%;
     }
-    
+
     /* 結果表示 */
     #required-amount {
       font-size: 1.5em;
       font-weight: bold;
       color: #009bdd;
     }
-    
+
     /* シミュレーション開始ボタン */
     .c-button._shiny {
       display: block;
@@ -189,12 +229,12 @@
       81% { -webkit-transform: scale(4) rotate(45deg); opacity: 1; }
       100% { -webkit-transform: scale(50) rotate(45deg); opacity: 0; }
     }
-    
+
     canvas {
       max-width: 100%;
       height: auto;
     }
-    
+
     /* レスポンシブ対応（PC・スマホ共通） */
     @media screen and (max-width: 768px) {
       .results,
@@ -203,52 +243,47 @@
         padding: 0;
       }
 
-      /* ▼ 入力エリアの行配置を縦並びにし、幅を整える ▼ */
       .input-overlay .row {
         flex-direction: column; 
         gap: 10px;
-        align-items: flex-start; 
+        align-items: flex-start;
         width: 100%;
       }
-
-      /* 左右の要素を幅100%にして縦に並べる */
       .left-item, .right-item {
         width: 100% !important;
         margin: 0 !important;
         text-align: left;
       }
-
-      /* 入力ボックスはブロック要素にし、右寄せにしたい場合は text-align:right */
       .input-overlay .input-wrapper {
         display: block;
         width: 100%;
-        text-align: right; 
+        text-align: right;
       }
-
       .input-overlay label {
         display: block;
         text-align: left;
         margin-bottom: 5px;
       }
-
-      #retirement-start-age, 
+      #retirement-start-age,
       #retirement-end-age,
-      #final-assets, 
-      #annual-rate-1, 
+      #final-assets,
+      #annual-rate-1,
       #withdrawal-1 {
         width: 100px;
       }
-
       .input-wrapper input[type="number"],
       .input-wrapper select {
         padding: 8px 10px 8px 8px;
       }
-
       .c-button._shiny {
         margin: 20px auto;
       }
-      body { line-height: 1.6; }
-      .step-image { width: 50px; }
+      body {
+        line-height: 1.6;
+      }
+      .step-image {
+        width: 50px;
+      }
       .step-description {
          font-size: 18px;
          margin-left: 5px;
@@ -257,18 +292,15 @@
       .inputs .field-group select {
         width: 100%;
       }
-      /* スマホビューでは、想定年利(基本/老後)の改行を非表示 */
       .desktop-only { display: none; }
-      /* スマホビュー：保有額と想定年利の間に余白を追加 */
       .additional-row { margin-bottom: 20px; }
-      /* ステップコンテナの余白 */
       @media screen and (max-width: 768px) {
         .step-container {
           margin-bottom: -30px;
         }
       }
     }
-    
+
     /* オプション入力エリア（カード削除版：各セクションを平坦に配置） */
     .inputs h4 {
       color: #009bdd;
@@ -317,8 +349,8 @@
 <body>
   <div class="container">
     <!-- タイトル部分：画像を横幅MAXで表示 -->
-    <img src="title.webp" alt="老後資金シミュレーター" style="width:100%; height:auto;">
-    
+    <img src="title.webp" alt="老後資金シミュレーター" class="title-image">
+
     <!-- STEP1 -->
     <div class="step-container step1">
       <div class="step-indicator">
@@ -571,7 +603,6 @@
         retirementChart.data.datasets[0].data = simulationData;
         retirementChart.update();
         
-        // 2つ目のボタンでも結果エリアにスクロール
         document.querySelector(".results").scrollIntoView({ behavior: 'smooth' });
       }
       
