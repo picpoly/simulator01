@@ -198,15 +198,17 @@
     
     /* レスポンシブ対応（PC・スマホ共通） */
     @media screen and (max-width: 768px) {
-      .results, .inputs {
-        width: 95%;
-        padding: 15px;
-      }
-      
-      .input-overlay .row {
-        flex-direction: column;
-        gap: 10px;
-      }
+      .results,
+  .inputs {
+    width: 100%;
+    padding: 0;
+  }
+
+  .input-overlay .row {
+    flex-direction: column; 
+    gap: 10px;
+    align-items: flex-start; 
+  }
       .left-item, .right-item {
         margin: 0;
         text-align: left;
