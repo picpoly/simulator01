@@ -22,16 +22,15 @@
       margin: 0;
     }
     /* PCビュー（768px以上）の場合 */
-@media screen and (min-width: 769px) {
-  .pc-label { display: inline-block; }
-  .mobile-label { display: none; }
-}
-
-/* スマホビュー（768px以下）の場合 */
-@media screen and (max-width: 768px) {
-  .pc-label { display: none; }
-  .mobile-label { display: inline-block; }
-}
+    @media screen and (min-width: 769px) {
+      .pc-label { display: inline-block; }
+      .mobile-label { display: none; }
+    }
+    /* スマホビュー（768px以下）の場合 */
+    @media screen and (max-width: 768px) {
+      .pc-label { display: none; }
+      .mobile-label { display: inline-block; }
+    }
 
     .container {
       display: flex;
@@ -40,7 +39,7 @@
       gap: 20px;
       padding: 0 10px;
     }
-    /* カードスタイル削除：境界線、角丸、影を除去してフラットなデザインに変更 */
+    /* カードスタイル削除：境界線、角丸、影を除去してフラットなデザインに */
     .results, .inputs {
       width: 80%;
       max-width: 800px;
@@ -85,13 +84,13 @@
     /* 結果エリア */
     .results { position: relative; }
     
-    /* 入力ラッパー（グラフ下部の入力エリア） */
+    /* 入力ラッパ（グラフ下部の入力エリア） */
     .input-wrapper input[type="number"],
     .input-wrapper select {
       padding: 8px 100px 8px 8px;
-      border: none;              /* 枠線を削除 */
-      background-color: #e6f7ff;   /* 水色の背景 */
-      border-radius: 0;          /* 角丸なし */
+      border: none;             
+      background-color: #e6f7ff; 
+      border-radius: 0;         
       height: 40px;
       box-sizing: border-box;
       font-size: 16px;
@@ -199,35 +198,58 @@
     /* レスポンシブ対応（PC・スマホ共通） */
     @media screen and (max-width: 768px) {
       .results,
-  .inputs {
-    width: 100%;
-    padding: 0;
-  }
+      .inputs {
+        width: 100%;
+        padding: 0;
+      }
 
-  .input-overlay .row {
-    flex-direction: column; 
-    gap: 10px;
-    align-items: flex-start; 
-  }
+      /* ▼ 入力エリアの行配置を縦並びにし、幅を整える ▼ */
+      .input-overlay .row {
+        flex-direction: column; 
+        gap: 10px;
+        align-items: flex-start; 
+        width: 100%;
+      }
+
+      /* 左右の要素を幅100%にして縦に並べる */
       .left-item, .right-item {
-        margin: 0;
+        width: 100% !important;
+        margin: 0 !important;
         text-align: left;
       }
-      /* 各入力エリアの幅をスマホ用に調整 */
-      #retirement-start-age, #retirement-end-age,
-      #final-assets, #annual-rate-1, #withdrawal-1 {
+
+      /* 入力ボックスはブロック要素にし、右寄せにしたい場合は text-align:right */
+      .input-overlay .input-wrapper {
+        display: block;
+        width: 100%;
+        text-align: right; 
+      }
+
+      .input-overlay label {
+        display: block;
+        text-align: left;
+        margin-bottom: 5px;
+      }
+
+      #retirement-start-age, 
+      #retirement-end-age,
+      #final-assets, 
+      #annual-rate-1, 
+      #withdrawal-1 {
         width: 100px;
       }
+
       .input-wrapper input[type="number"],
       .input-wrapper select {
-        padding: 8px 10px 8px 8px; /* 右側パディングを縮小 */
+        padding: 8px 10px 8px 8px;
       }
+
       .c-button._shiny {
         margin: 20px auto;
       }
       body { line-height: 1.6; }
       .step-image { width: 50px; }
-      .step-description { 
+      .step-description {
          font-size: 18px;
          margin-left: 5px;
       }
@@ -235,25 +257,16 @@
       .inputs .field-group select {
         width: 100%;
       }
-      /* スマホビューでは、想定年利(基本/老後)の改行を非表示に */
+      /* スマホビューでは、想定年利(基本/老後)の改行を非表示 */
       .desktop-only { display: none; }
-      /* スマホビュー：保有額(老後終了時)と想定年利(基本/老後)の間に余白を追加 */
+      /* スマホビュー：保有額と想定年利の間に余白を追加 */
       .additional-row { margin-bottom: 20px; }
-      /* 各項目の表示方法を統一：1行目ラベル（左寄せ）、2行目入力フィールド（右寄せ） */
-      .input-overlay label {
-          display: block;
-          text-align: left;
-          margin-bottom: 5px;
-      }
-      .input-overlay .input-wrapper {
-          display: block;
-          text-align: right;
-      }
+      /* ステップコンテナの余白 */
       @media screen and (max-width: 768px) {
-  .step-container {
-    margin-bottom: -30px;
-  }
-}
+        .step-container {
+          margin-bottom: -30px;
+        }
+      }
     }
     
     /* オプション入力エリア（カード削除版：各セクションを平坦に配置） */
@@ -306,15 +319,15 @@
     <!-- タイトル部分：画像を横幅MAXで表示 -->
     <img src="title.webp" alt="老後資金シミュレーター" style="width:100%; height:auto;">
     
-    <!-- STEP1（画像挿入可能） -->
+    <!-- STEP1 -->
     <div class="step-container step1">
       <div class="step-indicator">
-        
+        <!-- ここにSTEP画像などを入れる場合は挿入 -->
       </div>
       <div class="step-description">基本的な項目を入力しよう</div>
     </div>
     
-    <!-- 結果エリア（上部） -->
+    <!-- 結果エリア -->
     <div class="results">
       <p>老後開始時の保有額: <span id="required-amount">0.00</span> 万円</p>
       
@@ -346,6 +359,7 @@
             });
           });
         </script>
+
         <!-- 入力エリア（グラフ下部） -->
         <div class="input-overlay">
           <div class="row first-row">
@@ -364,6 +378,7 @@
               </div>
             </div>
           </div>
+          
           <div class="row additional-row">
             <div class="left-item">
               <label for="withdrawal-1">資産を取り崩す金額／月額（基本）</label>
@@ -380,7 +395,7 @@
               </div>
             </div>
           </div>
-          <!-- 追加行：想定年利(基本/老後)（PCは改行、スマホは同一行） -->
+          <!-- 追加行：想定年利(基本/老後) -->
           <div class="row">
             <div class="full-item">
               <label for="annual-rate-1">想定年利(基本/老後)</label><br class="desktop-only">
@@ -396,15 +411,15 @@
       <button id="calculate" class="c-button _shiny">シミュレーション開始</button>
     </div>
     
-    <!-- STEP2（画像挿入可能） -->
+    <!-- STEP2 -->
     <div class="step-container step2">
       <div class="step-indicator">
-       
+        <!-- ここにSTEP画像などを入れる場合は挿入 -->
       </div>
       <div class="step-description">オプション項目を入力しよう</div>
     </div>
     
-    <!-- オプション入力エリア（カード削除版） -->
+    <!-- オプション入力エリア -->
     <div class="inputs">
       <!-- 金利・取崩額の変更セクション -->
       <h4>取崩し開始時の「年齢」「金額」「金利」変更</h4>
@@ -479,7 +494,7 @@
       populateSelect("lump-investment-age", 70);
     });
     
-    // シミュレーション計算（計算ロジックは変更していません）
+    // シミュレーション計算（計算ロジックは変更なし）
     document.addEventListener('DOMContentLoaded', function() {
       function runSimulation() {
         // 基本入力
@@ -556,15 +571,14 @@
         retirementChart.data.datasets[0].data = simulationData;
         retirementChart.update();
         
-        // 2つ目のボタンの場合、結果エリアへスライド
+        // 2つ目のボタンでも結果エリアにスクロール
         document.querySelector(".results").scrollIntoView({ behavior: 'smooth' });
       }
       
+      // 2つのボタンで同じシミュレーションを実行
       document.getElementById("calculate").addEventListener("click", runSimulation);
       document.getElementById("calculate2").addEventListener("click", runSimulation);
     });
   </script>
-  
 </body>
 </html>
-
